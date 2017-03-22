@@ -76,6 +76,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 		Location displayLoc2 = player.getLocation().clone().add(x2, height, z2);
 		AirAbility.getAirbendingParticles().display(displayLoc2, 0, 0, 0, 0, 3);
 		AirAbility.getAirbendingParticles().display(displayLoc, 0, 0, 0, 0, 3);
+		AirAbility.playAirbendingSound(player.getLocation());
 
 	}
 

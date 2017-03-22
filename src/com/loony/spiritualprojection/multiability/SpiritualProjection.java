@@ -138,9 +138,9 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public ArrayList<MultiAbilityInfoSub> getMultiAbilities() {
 
 		ArrayList<MultiAbilityInfoSub> SpiritualProjection = new ArrayList<MultiAbilityInfoSub>();
-		SpiritualProjection.add(new MultiAbilityInfoSub("Meditate", Element.AIR));
-		SpiritualProjection.add(new MultiAbilityInfoSub("Spirit", Element.AIR));
-		SpiritualProjection.add(new MultiAbilityInfoSub("AstralAttack", Element.AIR));
+		SpiritualProjection.add(new MultiAbilityInfoSub("Meditate", Element.SPIRITUAL));
+		SpiritualProjection.add(new MultiAbilityInfoSub("Spirit", Element.SPIRITUAL));
+		SpiritualProjection.add(new MultiAbilityInfoSub("AstralAttack", Element.SPIRITUAL));
 
 		return SpiritualProjection;
 	}
