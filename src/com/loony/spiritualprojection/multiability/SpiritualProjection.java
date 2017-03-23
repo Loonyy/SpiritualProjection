@@ -195,7 +195,20 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 		return "1.0.0";
 	}
+	
+	@Override
+	public String getDescription() {
+		return ChatColor.GRAY + "" + ChatColor.BOLD + "Developed by Loony\n" 
+				+ ChatColor.GRAY + "Spiritual Projection is a completely unique and advanced spiritual abilitity that allows you to focus your spiritual energy into attack, defence or even mobility. These abilities require you to have enough spiritual energy, which can be recharged by meditating. To begin using this ability, just tap sneak.";
+		
+	}
 
+	@Override
+	public String getInstructions() {
+		return "\nMeditate - " + ChatColor.GRAY + "Hold sneak to charge up your spiritual energy.\n" + ChatColor.GOLD +
+	"Spirit - " + ChatColor.GRAY + "Hold sneak to transform into a spirit and begin travelling. If you release sneak, the ability will cancel.\n" +
+				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.";
+	}
 	//This doesn't work because MultiAbilities are shit
 	public void displayBoundMsg(int slot) {
 		String name = bPlayer.getAbilities().get(slot);
