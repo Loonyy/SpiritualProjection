@@ -15,15 +15,22 @@ import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
 
 public class SpiritualProjectionListener implements Listener {
 
+	// This doesn't work because MultiAbilities are shit
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onPlayerSlotChange(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		String abil = bPlayer.getBoundAbilityName();
 
 		SpiritualProjection spiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
-		if (spiritualProjection != null) {
-			spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
-			return;
+		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
+			abil = MultiAbilityManager.getBoundMultiAbility(player);
+			if (abil.equalsIgnoreCase("SpiritualProjection")) {
+				spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
+				return;
+			}
 		}
+
 	}
 
 	@EventHandler

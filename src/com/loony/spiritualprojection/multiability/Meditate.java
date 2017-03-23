@@ -135,7 +135,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 	@Override
 	public boolean isHarmlessAbility() {
 
-		return false;
+		return true;
 	}
 
 	@Override

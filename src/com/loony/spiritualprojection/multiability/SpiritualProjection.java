@@ -29,11 +29,10 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public static HashMap<String, BossBar> bar = new HashMap<String, BossBar>();
 	public static HashMap<String, Integer> powerAmount = new HashMap<String, Integer>();
 	public static BossBar bossBar;
-	 
+
 	public static Config config;
 	private long cooldown;
 	public static String path = "ExtraAbilities.Loony.SpiritualProjection.";
-	
 
 	public SpiritualProjection(Player player) {
 		super(player);
@@ -56,6 +55,11 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 				case 2:
 					if (player.hasPermission("bending.ability.SpiritualProjection.AtralAttack")) {
 						new AstralAttack(player);
+					}
+					break;
+				case 3:
+					if (player.hasPermission("bending.ability.SpiritualProjection.AstralDrain")) {
+						new AstralDrain(player);
 					}
 					break;
 				default:
@@ -110,24 +114,24 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public void load() {
 		Bukkit.getPluginManager().registerEvents(new SpiritualProjectionListener(), ProjectKorra.plugin);
 		ProjectKorra.log.info(getName() + " by " + getAuthor() + " " + getVersion() + " has been loaded!");
-		
-		config = new Config(new File("ExtraAbilities.yml"));    
+
+		config = new Config(new File("ExtraAbilities.yml"));
 		FileConfiguration ExtraAbilities = config.get();
-	
-		//SpiritualProjection
+
+		// SpiritualProjection
 		ExtraAbilities.addDefault(path + "Cooldown", Long.valueOf(6000));
 
-		//Meditate
+		// Meditate
 		ExtraAbilities.addDefault(path + "Meditate.Cooldown", Long.valueOf(6000));
 		ExtraAbilities.addDefault(path + "Meditate.Duration", Long.valueOf(10000));
-		
-		//Spirit
+
+		// Spirit
 		ExtraAbilities.addDefault(path + "Spirit.Cooldown", Long.valueOf(5000));
 		ExtraAbilities.addDefault(path + "Spirit.Speed", Double.valueOf(0.6));
 		ExtraAbilities.addDefault(path + "Spirit.Duration", Long.valueOf(4500));
 		ExtraAbilities.addDefault(path + "Spirit.SpiritualEnergy", Integer.valueOf(20));
-		
-		//AstralAttack
+
+		// AstralAttack
 		ExtraAbilities.addDefault(path + "AstralAttack.Duration", Long.valueOf(6000));
 		ExtraAbilities.addDefault(path + "AstralAttack.Speed", Double.valueOf(0.8));
 		ExtraAbilities.addDefault(path + "AstralAttack.Cooldown", Long.valueOf(3000));
@@ -135,9 +139,9 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "AstralAttack.Knockback", Double.valueOf(4));
 		ExtraAbilities.addDefault(path + "AstralAttack.BlastRadius", Double.valueOf(2));
 		ExtraAbilities.addDefault(path + "AstralAttack.SpiritualEnergy", Long.valueOf(35));
-		
+
 		config.save();
-		
+
 	}
 
 	@Override
@@ -148,17 +152,6 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void stop() {
-		// if (bar.containsKey(player.getName())) {
-		// for (Player p : Bukkit.getOnlinePlayers()) {
-		// bar.get(player.getName()).removePlayer(p);
-		// }
-		// }
-		//
-		// if (CoreAbility.getAbility(player, Meditate.class) != null
-		// || CoreAbility.getAbility(player, Spirit.class) != null
-		// || CoreAbility.getAbility(player, AstralAttack.class) != null) {
-		// remove();
-		// }
 	}
 
 	@Override
@@ -203,10 +196,11 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		return "1.0.0";
 	}
 
+	//This doesn't work because MultiAbilities are shit
 	public void displayBoundMsg(int slot) {
 		String name = bPlayer.getAbilities().get(slot);
 		if (name != null) {
-			player.sendMessage(getElement().getColor() + "Ability:" + " " + name);
+			player.sendMessage(getElement().getColor() + "Ability: "  + name);
 		}
 	}
 
@@ -217,6 +211,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		SpiritualProjection.add(new MultiAbilityInfoSub("Meditate", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("Spirit", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("AstralAttack", Element.SPIRITUAL));
+		SpiritualProjection.add(new MultiAbilityInfoSub("AstralDrain", Element.SPIRITUAL));
 
 		return SpiritualProjection;
 	}
