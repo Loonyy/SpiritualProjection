@@ -58,8 +58,8 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 					}
 					break;
 				case 3:
-					if (player.hasPermission("bending.ability.SpiritualProjection.AstralDrain")) {
-						new AstralDrain(player);
+					if (player.hasPermission("bending.ability.SpiritualProjection.SpiritualDrain")) {
+						new SpiritualDrain(player);
 					}
 					break;
 				default:
@@ -127,6 +127,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "Meditate.EnergyAmount", Integer.valueOf(1));
 
 		// Spirit
+		ExtraAbilities.addDefault(path + "Spirit.SpiritTransfer", Boolean.valueOf(false));
 		ExtraAbilities.addDefault(path + "Spirit.Cooldown", Long.valueOf(5000));
 		ExtraAbilities.addDefault(path + "Spirit.Speed", Double.valueOf(0.6));
 		ExtraAbilities.addDefault(path + "Spirit.Duration", Long.valueOf(4500));
@@ -141,12 +142,12 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "AstralAttack.BlastRadius", Double.valueOf(2));
 		ExtraAbilities.addDefault(path + "AstralAttack.SpiritualEnergy", Long.valueOf(35));
 		
-		//AstralDrain
-		ExtraAbilities.addDefault(path + "AstralDrain.Cooldown", Long.valueOf(15000));
-		ExtraAbilities.addDefault(path + "AstralDrain.Range", Integer.valueOf(20));
-		ExtraAbilities.addDefault(path + "AstralDrain.DrainSpeed", Double.valueOf(0.8));
-		ExtraAbilities.addDefault(path + "AstralDrain.DrainedDuration", Long.valueOf(5500));
-		ExtraAbilities.addDefault(path + "AstralDrain.SpiritualEnergy", Integer.valueOf(45));
+		//SpiritualDrain
+		ExtraAbilities.addDefault(path + "SpiritualDrain.Cooldown", Long.valueOf(15000));
+		ExtraAbilities.addDefault(path + "SpiritualDrain.Range", Integer.valueOf(20));
+		ExtraAbilities.addDefault(path + "SpiritualDrain.DrainSpeed", Double.valueOf(0.8));
+		ExtraAbilities.addDefault(path + "SpiritualDrain.DrainedDuration", Long.valueOf(5500));
+		ExtraAbilities.addDefault(path + "SpiritualDrain.SpiritualEnergy", Integer.valueOf(45));
 
 		config.save();
 
@@ -216,7 +217,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		return "\nMeditate - " + ChatColor.GRAY + "Hold sneak to charge up your spiritual energy.\n" + ChatColor.GOLD +
 	"Spirit - " + ChatColor.GRAY + "Hold sneak to transform into a spirit and begin travelling. If you release sneak, the ability will cancel.\n" +
 				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.\n" + 
-	ChatColor.GOLD + "AstralDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.";
+	ChatColor.GOLD + "SpiritualDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.";
 	}
 	
 	
@@ -235,7 +236,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		SpiritualProjection.add(new MultiAbilityInfoSub("Meditate", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("Spirit", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("AstralAttack", Element.SPIRITUAL));
-		SpiritualProjection.add(new MultiAbilityInfoSub("AstralDrain", Element.SPIRITUAL));
+		SpiritualProjection.add(new MultiAbilityInfoSub("SpiritualDrain", Element.SPIRITUAL));
 
 		return SpiritualProjection;
 	}

@@ -18,7 +18,7 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
-public class AstralDrain extends AirAbility implements AddonAbility {
+public class SpiritualDrain extends AirAbility implements AddonAbility {
 
 	private Map<Entity, Location> particleLocation = new HashMap<Entity, Location>();
 	public static List<Entity> drainedEntities = new CopyOnWriteArrayList<Entity>();
@@ -30,7 +30,7 @@ public class AstralDrain extends AirAbility implements AddonAbility {
 	private long drainedDuration;
 	private boolean powerTake;
 
-	public AstralDrain(Player player) {
+	public SpiritualDrain(Player player) {
 		super(player);
 		if (bPlayer.isOnCooldown(this) || !bPlayer.canBendIgnoreBinds(this)) {
 			remove();
@@ -58,11 +58,11 @@ public class AstralDrain extends AirAbility implements AddonAbility {
 	}
 
 	public void setFields() {
-		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralDrain.Cooldown");
-		this.range = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "AstralDrain.Range");
-		this.drainSpeed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralDrain.DrainSpeed");
-		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "AstralDrain.SpiritualEnergy");
-		this.drainedDuration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralDrain.DrainedDuration");
+		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "SpiritualDrain.Cooldown");
+		this.range = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "SpiritualDrain.Range");
+		this.drainSpeed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "SpiritualDrain.DrainSpeed");
+		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "SpiritualDrain.SpiritualEnergy");
+		this.drainedDuration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "SpiritualDrain.DrainedDuration");
 		this.powerTake = false;
 		this.location = player.getLocation();
 
@@ -74,9 +74,6 @@ public class AstralDrain extends AirAbility implements AddonAbility {
 		if (!player.isSneaking()) {
 			remove();
 			return;
-		}
-		if (!powerTake) {
-			powerProgress();
 		}
 
 		drainPlayers();
@@ -96,6 +93,9 @@ public class AstralDrain extends AirAbility implements AddonAbility {
 				// Checks if entity's location is in HashMap
 				if (!particleLocation.containsKey(entity)) {
 					particleLocation.put(entity, entity.getLocation());
+					if (!powerTake) {
+						powerProgress();
+					}
 				}
 
 				Location entityLocation = particleLocation.get(entity);
@@ -161,7 +161,7 @@ public class AstralDrain extends AirAbility implements AddonAbility {
 	@Override
 	public String getName() {
 
-		return "AstralDrain";
+		return "SpiritualDrain";
 	}
 
 	@Override

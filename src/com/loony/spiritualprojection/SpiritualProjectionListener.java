@@ -2,13 +2,11 @@ package com.loony.spiritualprojection;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-import com.loony.spiritualprojection.multiability.AstralDrain;
+import com.loony.spiritualprojection.multiability.SpiritualDrain;
 import com.loony.spiritualprojection.multiability.SpiritualProjection;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
@@ -19,29 +17,32 @@ import com.projectkorra.projectkorra.event.AbilityStartEvent;
 public class SpiritualProjectionListener implements Listener {
 
 	// This doesn't work because MultiAbilities are shit
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public void onPlayerSlotChange(PlayerItemHeldEvent event) {
-		Player player = event.getPlayer();
-		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-		String abil = bPlayer.getBoundAbilityName();
-
-		SpiritualProjection spiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
-		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
-			abil = MultiAbilityManager.getBoundMultiAbility(player);
-			if (abil.equalsIgnoreCase("SpiritualProjection")) {
-				spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
-				return;
-			}
-		}
-
-	}
+//	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+//	public void onPlayerSlotChange(PlayerItemHeldEvent event) {
+//		Player player = event.getPlayer();
+//		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+//		String abil = bPlayer.getBoundAbilityName();
+//
+//		SpiritualProjection spiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
+//		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
+//			abil = MultiAbilityManager.getBoundMultiAbility(player);
+//			if (spiritualProjection == null) {
+//				Bukkit.broadcastMessage("null");
+//			}
+//			if (abil.equalsIgnoreCase("SpiritualProjection")) {
+//				spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
+//				return;
+//			}
+//		}
+//
+//	}
 
 	//Checks if player is spiritually drained
 	@EventHandler
 	public void onAbility(AbilityProgressEvent event) {
 		Player player = event.getAbility().getPlayer();
 
-		if (AstralDrain.drainedEntities.contains(player)) {
+		if (SpiritualDrain.drainedEntities.contains(player)) {
 			event.getAbility().remove();
 		}
 	}
@@ -51,7 +52,7 @@ public class SpiritualProjectionListener implements Listener {
 	public void onAbilityStart(AbilityStartEvent event) {
 		Player player = event.getAbility().getPlayer();
 
-		if (AstralDrain.drainedEntities.contains(player)) {
+		if (SpiritualDrain.drainedEntities.contains(player)) {
 
 			event.setCancelled(true);
 		}

@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -25,6 +26,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	private GameMode gameMode;
 	private Location startLocation;
 	private int spiritualEnergy;
+	private boolean canSpiritTransfer;
 
 	public Spirit(Player player) {
 		super(player);
@@ -55,14 +57,18 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	}
 
 	public void setFields() {
-		
+
 		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Cooldown");
 		this.speed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "Spirit.Speed");
 		this.duration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Duration");
-		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Spirit.SpiritualEnergy");
+		this.spiritualEnergy = SpiritualProjection.config.get()
+				.getInt(SpiritualProjection.path + "Spirit.SpiritualEnergy");
+		this.canSpiritTransfer = SpiritualProjection.config.get()
+				.getBoolean(SpiritualProjection.path + "Spirit.SpiritTransfer");
 		this.location = player.getLocation();
 		this.gameMode = player.getGameMode();
 		this.startLocation = player.getLocation().clone();
+
 	}
 
 	@Override
@@ -70,6 +76,11 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		bPlayer.addCooldown(this);
 		if (!player.isSneaking()) {
+			if (!canSpiritTransfer) {
+				player.teleport(startLocation);
+				player.setGameMode(gameMode);
+
+			}
 			if (player.getLocation().getBlock().getType() != Material.AIR) {
 				player.teleport(startLocation);
 				player.setGameMode(gameMode);
@@ -95,8 +106,13 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		// Checks if the duration is up
 		if (System.currentTimeMillis() > time + duration) {
+			if (!canSpiritTransfer) {
+				player.teleport(startLocation);
+				player.setGameMode(gameMode);
 
-			if (player.getLocation().getBlock().getType() != Material.AIR || GeneralMethods.isRegionProtectedFromBuild(player, location)) {
+			}
+			if (player.getLocation().getBlock().getType() != Material.AIR
+					|| GeneralMethods.isRegionProtectedFromBuild(player, location)) {
 				player.teleport(startLocation);
 				player.setGameMode(gameMode);
 				player.sendMessage(ChatColor.RED + "Spirit transfer failed.");
@@ -117,7 +133,8 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 5));
 		ParticleEffect.CLOUD.display(player.getLocation(), 0, 0, 0, 0, 1);
 		player.playSound(player.getEyeLocation(), Sound.ENTITY_TNT_PRIMED, 2, 20);
-		player.setVelocity(player.getEyeLocation().getDirection().clone().normalize().multiply(speed));
+		player.setVelocity(
+				player.getEyeLocation().getDirection().clone().normalize().multiply(speed).add(new Vector(0, 0.25, 0)));
 
 	}
 
