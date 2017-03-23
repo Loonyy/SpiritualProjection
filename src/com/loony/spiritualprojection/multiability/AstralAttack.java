@@ -3,18 +3,28 @@ package com.loony.spiritualprojection.multiability;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.util.Vector;
 
+import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
+import com.projectkorra.projectkorra.avatar.AvatarState;
+import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
+import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
 public class AstralAttack extends SpiritualAbility implements AddonAbility {
@@ -23,34 +33,118 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 	private boolean spawnStand;
 	private ArmorStand stand;
 	private Location standLocation;
+	private long time;
+	private double timefactor;
+	private long duration;
+	private double speed;
+	private Location location;
+	private long chargeTime;
+	private boolean charged;
+	private boolean setTime;
+	private long cooldown;
+	private double damage;
+	private double knockback;
+	private double radius;
+	private int spiritualEnergy;
 
 	public AstralAttack(Player player) {
 		super(player);
 
-		start();
+		if (bPlayer.isOnCooldown(this) || !bPlayer.canBendIgnoreBinds(this)) {
+			remove();
+			return;
+		}
+		setFields();
+		// Checks if the player is in the HashMap
+		if (SpiritualProjection.powerAmount.containsKey(player.getName().toString())) {
+
+			// Checks if they have enough spiritual energy to use the ability
+			if (SpiritualProjection.powerAmount.get(player.getName().toString()) < spiritualEnergy) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD
+						+ "You do not possess enough spiritual connection to use this ability.");
+
+			}
+
+			// Continues ability if they have enough spiritual energy
+			if (SpiritualProjection.powerAmount.get(player.getName().toString()) >= spiritualEnergy) {
+
+				start();
+			}
+
+		}
+
+	}
+
+	public void setFields() {
+		this.time = System.currentTimeMillis();
+		this.duration = 6000;
+		this.speed = 0.8;
+		this.chargeTime = 4000;
+		this.location = player.getLocation();
+		this.charged = false;
+		this.setTime = false;
+		this.cooldown = 2500;
+		this.damage = 6;
+		this.knockback = 4;
+		this.radius = 2.5;
+		this.spiritualEnergy = 30;
 
 	}
 
 	@Override
 	public void progress() {
-
-		Location loc = player.getEyeLocation();
-		if (!spawnStand) {
-			Stand(loc);
-			stand.setVelocity(player.getEyeLocation().getDirection().clone().normalize().multiply(2.5));
-
-		}
-		if (stand.getVelocity().equals(0)) {
-		
+		if (!player.isSneaking()) {
 			removeStand();
 			remove();
 			return;
 		}
-		
-		if (stand.getVelocity().clone().equals(0)) {
-			Bukkit.broadcastMessage("1");
+		bPlayer.addCooldown(this);
+
+		if (!setTime) {
+			setTime = true;
+			this.time = System.currentTimeMillis();
 		}
 
+		if (!spawnStand) {
+			powerProgress();
+			Stand(location);
+
+		}
+
+		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(stand.getLocation(), radius)) {
+			affect(entity);
+			if (entity instanceof LivingEntity) {
+				break;
+			}
+		}
+
+		if (System.currentTimeMillis() > time + duration) {
+
+			removeStand();
+			remove();
+			return;
+		}
+
+		progressStand();
+
+	}
+
+	// Updates the HashMap spiritual energy & boss bar
+	public void powerProgress() {
+		SpiritualProjection SpiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
+		int amountPower = SpiritualProjection.powerAmount.get(player.getName().toString());
+		SpiritualProjection.powerAmount.put(player.getName().toString(),
+				SpiritualProjection.powerAmount.get(player.getName().toString()) - spiritualEnergy);
+		if (SpiritualProjection != null) {
+			SpiritualProjection.bar.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
+		}
+
+	}
+
+	public void progressStand() {
+		timefactor = 1 - (System.currentTimeMillis() - time) / (speed * duration);
+		Vector velocity = player.getEyeLocation().getDirection().clone().normalize().multiply(speed * timefactor);
+		stand.setVelocity(velocity);
 		AirAbility.playAirbendingParticles(stand.getLocation(), 10, 0, 0, 0);
 		AirAbility.playAirbendingParticles(stand.getEyeLocation(), 10, 0, 0, 0);
 		AirAbility.playAirbendingParticles(stand.getLocation().add(1, 0, 0), 10, 0, 0, 0);
@@ -60,8 +154,8 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 
 	}
 
-	public ArmorStand Stand(Location loc) {
-		this.stand = loc.getWorld().spawn(loc, ArmorStand.class);
+	public ArmorStand Stand(Location location) {
+		this.stand = location.getWorld().spawn(location, ArmorStand.class);
 		stand.setGravity(true);
 		stand.setSmall(true);
 		ItemStack helm = new ItemStack(Material.LEATHER_HELMET, 1);
@@ -100,6 +194,23 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 		return stand;
 	}
 
+	private void affect(Entity entity) {
+
+		if (!entity.getUniqueId().equals(player.getUniqueId()) && entity != stand) {
+
+			GeneralMethods.setVelocity(entity, player.getLocation().getDirection().clone().multiply(knockback));
+			if (entity instanceof LivingEntity) {
+				DamageHandler.damageEntity(entity, damage, this);
+				AirAbility.breakBreathbendingHold(entity);
+				ParticleEffect.EXPLOSION_HUGE.display(stand.getLocation(), 0, 0, 0, 0, 5);
+				AirAbility.playAirbendingSound(stand.getLocation());
+				removeStand();
+				remove();
+
+			}
+		}
+	}
+
 	public void removeStand() {
 		for (World world : Bukkit.getServer().getWorlds()) {
 			for (org.bukkit.entity.Entity entity : world.getEntities()) {
@@ -111,15 +222,20 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 	}
 
 	@Override
+	public void remove() {
+		super.remove();
+	}
+
+	@Override
 	public long getCooldown() {
 
-		return 0;
+		return cooldown;
 	}
 
 	@Override
 	public Location getLocation() {
 
-		return null;
+		return location;
 	}
 
 	@Override

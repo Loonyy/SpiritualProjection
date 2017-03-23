@@ -1,10 +1,14 @@
 package com.loony.spiritualprojection.multiability;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import com.loony.spiritualprojection.SpiritualProjectionListener;
@@ -19,10 +23,14 @@ import com.projectkorra.projectkorra.configuration.ConfigManager;
 
 public class SpiritualProjection extends SpiritualAbility implements AddonAbility, MultiAbility {
 
+	protected BossBar bar;
+	public static HashMap<String, Integer> powerAmount = new HashMap<String, Integer>();
+
 	public SpiritualProjection(Player player) {
 		super(player);
 
-		//Checks for MultiAbility and sets up each bind 
+		setupPower();
+		// Checks for MultiAbility and sets up each bind
 		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
 			String abil = MultiAbilityManager.getBoundMultiAbility(player);
 			if (abil.equalsIgnoreCase("SpiritualProjection")) {
@@ -63,6 +71,21 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	}
 
+	// Sets up the boss bar & puts the player in the spiritual energy HashMap
+	public void setupPower() {
+
+		if (!powerAmount.containsKey(player.getName().toString())) {
+			powerAmount.put(player.getName().toString(), 0);
+
+			bar = Bukkit.createBossBar(
+					ChatColor.YELLOW + "" + ChatColor.MAGIC + "I " + ChatColor.GRAY + "" + ChatColor.BOLD
+							+ "Spiritual Energy" + ChatColor.YELLOW + "" + ChatColor.MAGIC + " I",
+					BarColor.BLUE, BarStyle.SEGMENTED_12);
+			bar.addPlayer(player);
+		}
+
+	}
+
 	@Override
 	public void progress() {
 
@@ -84,8 +107,10 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void remove() {
+		Bukkit.broadcastMessage("r");
 		super.remove();
 	}
+
 	@Override
 	public void stop() {
 	}

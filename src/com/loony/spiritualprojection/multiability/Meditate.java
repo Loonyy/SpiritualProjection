@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 
 public class Meditate extends AirAbility implements AddonAbility {
 
@@ -24,15 +25,13 @@ public class Meditate extends AirAbility implements AddonAbility {
 	private Location location;
 	private int chargeTicks;
 	private int ticks;
-	public static HashMap<String, Integer> powerAmount = new HashMap<String, Integer>();
-	protected static BossBar bar;
+	
 
 	public Meditate(Player player) {
 		super(player);
 
 		if (bPlayer.canBendIgnoreBinds(this)) {
 			setFields();
-			setupPower();
 
 			start();
 
@@ -45,7 +44,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 		this.charged = false;
 		this.chargeTime = 10000;
 		this.location = player.getLocation();
-		this.cooldown = 3000;
+		this.cooldown = 10000;
 		this.time = System.currentTimeMillis();
 	}
 
@@ -56,6 +55,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 			remove();
 			return;
 		}
+		bPlayer.addCooldown(this);
 
 		ticks++;
 
@@ -76,22 +76,9 @@ public class Meditate extends AirAbility implements AddonAbility {
 
 	}
 
-	// Sets up the boss bar & puts the player in the spiritual energy HashMap
-	public void setupPower() {
-		if (!powerAmount.containsKey(player.getName().toString())) {
-			powerAmount.put(player.getName().toString(), 0);
-			bar = Bukkit.createBossBar(
-					ChatColor.YELLOW + "" + ChatColor.MAGIC + "I " + ChatColor.GRAY + "" + ChatColor.BOLD
-							+ "Spiritual Energy" + ChatColor.YELLOW + "" + ChatColor.MAGIC + " I",
-					BarColor.BLUE, BarStyle.SEGMENTED_12);
-			bar.addPlayer(player);
-		}
-
-	}
-
 	// Updates the spiritual energy HashMap and boss bar
 	public void powerProgress() {
-		int amountPower = powerAmount.get(player.getName().toString());
+		int amountPower = SpiritualProjection.powerAmount.get(player.getName().toString());
 
 		if (amountPower >= 100) {
 			player.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "Your spiritual connection has fully recharged.");
@@ -99,8 +86,12 @@ public class Meditate extends AirAbility implements AddonAbility {
 			return;
 		}
 
-		powerAmount.put(player.getName().toString(), powerAmount.get(player.getName().toString()) + 1);
-		bar.setProgress((float) amountPower / (float) 100);
+		SpiritualProjection.powerAmount.put(player.getName().toString(), SpiritualProjection.powerAmount.get(player.getName().toString()) + 1);
+		SpiritualProjection SpiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
+		if (SpiritualProjection != null) {
+			SpiritualProjection.bar.setProgress((float) amountPower / (float) 100);
+			Bukkit.broadcastMessage("1");
+		}
 
 	}
 
