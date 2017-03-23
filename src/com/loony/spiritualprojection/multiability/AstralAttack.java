@@ -26,16 +26,15 @@ import com.projectkorra.projectkorra.util.ParticleEffect;
 public class AstralAttack extends SpiritualAbility implements AddonAbility {
 
 	ArrayList<Integer> stands = new ArrayList<Integer>();
+	@SuppressWarnings("unused")
+	private Location standLocation;
 	private boolean spawnStand;
 	private ArmorStand stand;
-	private Location standLocation;
 	private long time;
 	private double timefactor;
 	private long duration;
 	private double speed;
 	private Location location;
-	private long chargeTime;
-	private boolean charged;
 	private boolean setTime;
 	private long cooldown;
 	private double damage;
@@ -72,19 +71,17 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 	}
 
 	public void setFields() {
+		
+		this.duration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralAttack.Duration");
+		this.speed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Speed");
+		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralAttack.Cooldown");
+		this.damage = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Damage");
+		this.knockback = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Knockback");
+		this.radius = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.BlastRadius");;
+		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "AstralAttack.SpiritualEnergy");;
 		this.time = System.currentTimeMillis();
-		this.duration = 6000;
-		this.speed = 0.8;
-		this.chargeTime = 4000;
 		this.location = player.getLocation();
-		this.charged = false;
 		this.setTime = false;
-		this.cooldown = 2500;
-		this.damage = 6;
-		this.knockback = 4;
-		this.radius = 2.5;
-		this.spiritualEnergy = 30;
-
 	}
 
 	@Override

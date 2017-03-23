@@ -14,7 +14,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 	@SuppressWarnings("unused")
 	private boolean charged;
 	private long cooldown;
-	private long chargeTime;
+	private long duration;
 	private Location location;
 	private int chargeTicks;
 	private int ticks;
@@ -33,10 +33,10 @@ public class Meditate extends AirAbility implements AddonAbility {
 
 	public void setFields() {
 
+		this.duration = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Meditate.Duration");
+		this.cooldown = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Meditate.Cooldown");
 		this.charged = false;
-		this.chargeTime = 10000;
 		this.location = player.getLocation();
-		this.cooldown = 10000;
 		this.time = System.currentTimeMillis();
 	}
 
@@ -52,7 +52,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 		ticks++;
 
 		// Checks if ability is still charging
-		if (System.currentTimeMillis() < getStartTime() + chargeTime) {
+		if (System.currentTimeMillis() < getStartTime() + duration) {
 			powerProgress();
 			Long chargingTime = System.currentTimeMillis() - getStartTime();
 			this.chargeTicks = (int) (chargingTime / 50);
@@ -60,7 +60,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 		}
 
 		// Checks if the ability is charged
-		if (System.currentTimeMillis() > getStartTime() + chargeTime) {
+		if (System.currentTimeMillis() > getStartTime() + duration) {
 
 			charged = true;
 
@@ -80,7 +80,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 
 		SpiritualProjection.powerAmount.put(player.getName().toString(),
 				SpiritualProjection.powerAmount.get(player.getName().toString()) + 1);
-	
+
 		if (SpiritualProjection.bar.containsKey(player.getName())) {
 			SpiritualProjection.bar.get(player.getName()).setProgress((float) amountPower / (float) 100);
 		}
@@ -158,6 +158,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 
 	@Override
 	public void load() {
+
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package com.loony.spiritualprojection;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,16 +25,19 @@ public class SpiritualProjectionListener implements Listener {
 			return;
 		}
 	}
-	
+
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 		String abil = bPlayer.getBoundAbilityName();
-		
-		if (abil.equalsIgnoreCase("SpiritualProtection")) {
-			Bukkit.broadcastMessage("mkmekmkemkdmekmedkemekm");
-			player.setGameMode(GameMode.SURVIVAL);
+
+		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
+			abil = MultiAbilityManager.getBoundMultiAbility(player);
+			if (abil.equalsIgnoreCase("SpiritualProjection")) {
+				SpiritualProjection.bar.remove(player.getName());
+				SpiritualProjection.powerAmount.remove(player.getName());
+			}
 		}
 	}
 

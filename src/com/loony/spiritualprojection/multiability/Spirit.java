@@ -55,14 +55,14 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	}
 
 	public void setFields() {
+		
+		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Cooldown");
+		this.speed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "Spirit.Speed");
+		this.duration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Duration");
+		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Spirit.SpiritualEnergy");
 		this.location = player.getLocation();
-		this.cooldown = 4000;
-		this.speed = 0.6;
-		this.duration = 4000;
 		this.gameMode = player.getGameMode();
 		this.startLocation = player.getLocation().clone();
-		this.spiritualEnergy = 20;
-
 	}
 
 	@Override
