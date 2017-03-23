@@ -15,6 +15,7 @@ import com.loony.spiritualprojection.SpiritualProjectionListener;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.AddonAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.MultiAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
@@ -23,13 +24,12 @@ import com.projectkorra.projectkorra.configuration.ConfigManager;
 
 public class SpiritualProjection extends SpiritualAbility implements AddonAbility, MultiAbility {
 
-	protected BossBar bar;
+	public static HashMap<String, BossBar> bar = new HashMap<String, BossBar>();
 	public static HashMap<String, Integer> powerAmount = new HashMap<String, Integer>();
 
 	public SpiritualProjection(Player player) {
 		super(player);
 
-		setupPower();
 		// Checks for MultiAbility and sets up each bind
 		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
 			String abil = MultiAbilityManager.getBoundMultiAbility(player);
@@ -59,6 +59,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 		else {
 			MultiAbilityManager.bindMultiAbility(player, "SpiritualProjection");
+			setupPower();
 
 		}
 		if (ChatColor.stripColor(bPlayer.getBoundAbilityName()) == null)
@@ -77,11 +78,15 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		if (!powerAmount.containsKey(player.getName().toString())) {
 			powerAmount.put(player.getName().toString(), 0);
 
-			bar = Bukkit.createBossBar(
-					ChatColor.YELLOW + "" + ChatColor.MAGIC + "I " + ChatColor.GRAY + "" + ChatColor.BOLD
-							+ "Spiritual Energy" + ChatColor.YELLOW + "" + ChatColor.MAGIC + " I",
-					BarColor.BLUE, BarStyle.SEGMENTED_12);
-			bar.addPlayer(player);
+			if (!bar.containsKey(player.getName())) {
+				BossBar bossBar = Bukkit.createBossBar(
+						ChatColor.YELLOW + "" + ChatColor.MAGIC + "I " + ChatColor.GRAY + "" + ChatColor.BOLD
+								+ "Spiritual Energy" + ChatColor.YELLOW + "" + ChatColor.MAGIC + " I",
+						BarColor.BLUE, BarStyle.SEGMENTED_12);
+				bar.put(player.getName(), bossBar);
+				bossBar.addPlayer(player);
+			}
+
 		}
 
 	}
@@ -107,12 +112,26 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void remove() {
-		Bukkit.broadcastMessage("r");
 		super.remove();
+		if (bar.containsKey(player.getName())) {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				bar.get(player.getName()).removePlayer(p);
+			}
+		}
+
+		if (CoreAbility.getAbility(player, Meditate.class) != null
+				|| CoreAbility.getAbility(player, Spirit.class) != null
+				|| CoreAbility.getAbility(player, AstralAttack.class) != null) {
+			remove();
+		}
+
 	}
 
 	@Override
 	public void stop() {
+		for (SpiritualProjection sp : CoreAbility.getAbilities(this.getClass())) {
+			sp.remove();
+		}
 	}
 
 	@Override

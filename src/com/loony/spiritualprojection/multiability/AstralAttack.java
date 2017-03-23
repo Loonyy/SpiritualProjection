@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -20,10 +19,7 @@ import org.bukkit.util.Vector;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
-import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
-import com.projectkorra.projectkorra.avatar.AvatarState;
-import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
@@ -131,12 +127,13 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 
 	// Updates the HashMap spiritual energy & boss bar
 	public void powerProgress() {
-		SpiritualProjection SpiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
+
 		int amountPower = SpiritualProjection.powerAmount.get(player.getName().toString());
 		SpiritualProjection.powerAmount.put(player.getName().toString(),
 				SpiritualProjection.powerAmount.get(player.getName().toString()) - spiritualEnergy);
-		if (SpiritualProjection != null) {
-			SpiritualProjection.bar.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
+		if (SpiritualProjection.bar.containsKey(player.getName())) {
+			SpiritualProjection.bar.get(player.getName())
+					.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
 		}
 
 	}

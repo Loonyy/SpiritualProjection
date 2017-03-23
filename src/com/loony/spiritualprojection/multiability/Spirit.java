@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
-import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
@@ -56,7 +56,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 	public void setFields() {
 		this.location = player.getLocation();
-		this.cooldown = 8000;
+		this.cooldown = 4000;
 		this.speed = 0.6;
 		this.duration = 4000;
 		this.gameMode = player.getGameMode();
@@ -95,7 +95,8 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		// Checks if the duration is up
 		if (System.currentTimeMillis() > time + duration) {
-			if (player.getLocation().getBlock().getType() != Material.AIR) {
+
+			if (player.getLocation().getBlock().getType() != Material.AIR || GeneralMethods.isRegionProtectedFromBuild(player, location)) {
 				player.teleport(startLocation);
 				player.setGameMode(gameMode);
 				player.sendMessage(ChatColor.RED + "Spirit transfer failed.");
@@ -122,13 +123,13 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 	// Updates the HashMap spiritual energy & boss bar
 	public void powerProgress() {
-		SpiritualProjection SpiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
 
 		int amountPower = SpiritualProjection.powerAmount.get(player.getName().toString());
 		SpiritualProjection.powerAmount.put(player.getName().toString(),
 				SpiritualProjection.powerAmount.get(player.getName().toString()) - spiritualEnergy);
-		if (SpiritualProjection != null) {
-			SpiritualProjection.bar.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
+		if (SpiritualProjection.bar.containsKey(player.getName())) {
+			SpiritualProjection.bar.get(player.getName())
+					.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
 		}
 
 	}
@@ -159,7 +160,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	@Override
 	public boolean isHarmlessAbility() {
 
-		return true;
+		return false;
 	}
 
 	@Override

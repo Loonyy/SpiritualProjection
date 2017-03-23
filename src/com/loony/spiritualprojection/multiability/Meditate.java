@@ -1,18 +1,11 @@
 package com.loony.spiritualprojection.multiability;
 
-import java.util.HashMap;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
-import com.projectkorra.projectkorra.ability.CoreAbility;
 
 public class Meditate extends AirAbility implements AddonAbility {
 
@@ -25,7 +18,6 @@ public class Meditate extends AirAbility implements AddonAbility {
 	private Location location;
 	private int chargeTicks;
 	private int ticks;
-	
 
 	public Meditate(Player player) {
 		super(player);
@@ -86,11 +78,11 @@ public class Meditate extends AirAbility implements AddonAbility {
 			return;
 		}
 
-		SpiritualProjection.powerAmount.put(player.getName().toString(), SpiritualProjection.powerAmount.get(player.getName().toString()) + 1);
-		SpiritualProjection SpiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
-		if (SpiritualProjection != null) {
-			SpiritualProjection.bar.setProgress((float) amountPower / (float) 100);
-			Bukkit.broadcastMessage("1");
+		SpiritualProjection.powerAmount.put(player.getName().toString(),
+				SpiritualProjection.powerAmount.get(player.getName().toString()) + 1);
+	
+		if (SpiritualProjection.bar.containsKey(player.getName())) {
+			SpiritualProjection.bar.get(player.getName()).setProgress((float) amountPower / (float) 100);
 		}
 
 	}
