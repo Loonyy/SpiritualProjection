@@ -124,6 +124,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		// Meditate
 		ExtraAbilities.addDefault(path + "Meditate.Cooldown", Long.valueOf(6000));
 		ExtraAbilities.addDefault(path + "Meditate.Duration", Long.valueOf(10000));
+		ExtraAbilities.addDefault(path + "Meditate.EnergyAmount", Integer.valueOf(1));
 
 		// Spirit
 		ExtraAbilities.addDefault(path + "Spirit.Cooldown", Long.valueOf(5000));
@@ -139,6 +140,13 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "AstralAttack.Knockback", Double.valueOf(4));
 		ExtraAbilities.addDefault(path + "AstralAttack.BlastRadius", Double.valueOf(2));
 		ExtraAbilities.addDefault(path + "AstralAttack.SpiritualEnergy", Long.valueOf(35));
+		
+		//AstralDrain
+		ExtraAbilities.addDefault(path + "AstralDrain.Cooldown", Long.valueOf(15000));
+		ExtraAbilities.addDefault(path + "AstralDrain.Range", Integer.valueOf(20));
+		ExtraAbilities.addDefault(path + "AstralDrain.DrainSpeed", Double.valueOf(0.8));
+		ExtraAbilities.addDefault(path + "AstralDrain.DrainedDuration", Long.valueOf(5500));
+		ExtraAbilities.addDefault(path + "AstralDrain.SpiritualEnergy", Integer.valueOf(45));
 
 		config.save();
 
@@ -207,8 +215,11 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public String getInstructions() {
 		return "\nMeditate - " + ChatColor.GRAY + "Hold sneak to charge up your spiritual energy.\n" + ChatColor.GOLD +
 	"Spirit - " + ChatColor.GRAY + "Hold sneak to transform into a spirit and begin travelling. If you release sneak, the ability will cancel.\n" +
-				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.";
+				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.\n" + 
+	ChatColor.GOLD + "AstralDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.";
 	}
+	
+	
 	//This doesn't work because MultiAbilities are shit
 	public void displayBoundMsg(int slot) {
 		String name = bPlayer.getAbilities().get(slot);

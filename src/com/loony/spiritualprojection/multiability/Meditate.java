@@ -18,7 +18,8 @@ public class Meditate extends AirAbility implements AddonAbility {
 	private Location location;
 	private int chargeTicks;
 	private int ticks;
-
+	private int energyAmount;
+	
 	public Meditate(Player player) {
 		super(player);
 
@@ -35,6 +36,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 
 		this.duration = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Meditate.Duration");
 		this.cooldown = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Meditate.Cooldown");
+		this.energyAmount = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "Meditate.EnergyAmount");
 		this.charged = false;
 		this.location = player.getLocation();
 		this.time = System.currentTimeMillis();
@@ -79,7 +81,7 @@ public class Meditate extends AirAbility implements AddonAbility {
 		}
 
 		SpiritualProjection.powerAmount.put(player.getName().toString(),
-				SpiritualProjection.powerAmount.get(player.getName().toString()) + 1);
+				SpiritualProjection.powerAmount.get(player.getName().toString()) + energyAmount);
 
 		if (SpiritualProjection.bar.containsKey(player.getName())) {
 			SpiritualProjection.bar.get(player.getName()).setProgress((float) amountPower / (float) 100);

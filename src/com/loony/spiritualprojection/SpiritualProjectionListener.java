@@ -8,10 +8,13 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
+import com.loony.spiritualprojection.multiability.AstralDrain;
 import com.loony.spiritualprojection.multiability.SpiritualProjection;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
+import com.projectkorra.projectkorra.event.AbilityProgressEvent;
+import com.projectkorra.projectkorra.event.AbilityStartEvent;
 
 public class SpiritualProjectionListener implements Listener {
 
@@ -29,6 +32,28 @@ public class SpiritualProjectionListener implements Listener {
 				spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
 				return;
 			}
+		}
+
+	}
+
+	//Checks if player is spiritually drained
+	@EventHandler
+	public void onAbility(AbilityProgressEvent event) {
+		Player player = event.getAbility().getPlayer();
+
+		if (AstralDrain.drainedEntities.contains(player)) {
+			event.getAbility().remove();
+		}
+	}
+
+	//Checks if player is spiritually drained
+	@EventHandler
+	public void onAbilityStart(AbilityStartEvent event) {
+		Player player = event.getAbility().getPlayer();
+
+		if (AstralDrain.drainedEntities.contains(player)) {
+
+			event.setCancelled(true);
 		}
 
 	}
