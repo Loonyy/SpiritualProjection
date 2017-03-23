@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import com.projectkorra.projectkorra.ability.AddonAbility;
+import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
@@ -36,10 +37,26 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 		Location loc = player.getEyeLocation();
 		if (!spawnStand) {
 			Stand(loc);
-			stand.setVelocity(player.getEyeLocation().getDirection().clone().normalize().multiply(5));
+			stand.setVelocity(player.getEyeLocation().getDirection().clone().normalize().multiply(2.5));
 
 		}
-		ParticleEffect.CLOUD.display(standLocation, 0, 0, 0, 0, 10);
+		if (stand.getVelocity().equals(0)) {
+		
+			removeStand();
+			remove();
+			return;
+		}
+		
+		if (stand.getVelocity().clone().equals(0)) {
+			Bukkit.broadcastMessage("1");
+		}
+
+		AirAbility.playAirbendingParticles(stand.getLocation(), 10, 0, 0, 0);
+		AirAbility.playAirbendingParticles(stand.getEyeLocation(), 10, 0, 0, 0);
+		AirAbility.playAirbendingParticles(stand.getLocation().add(1, 0, 0), 10, 0, 0, 0);
+		AirAbility.playAirbendingParticles(stand.getLocation().add(0, 0, 1), 10, 0, 0, 0);
+		AirAbility.playAirbendingParticles(stand.getEyeLocation().add(1, 0, 0), 10, 0, 0, 0);
+		AirAbility.playAirbendingParticles(stand.getEyeLocation().add(1, 0, 1), 10, 0, 0, 0);
 
 	}
 
@@ -51,7 +68,7 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 		ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
 		ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS, 1);
 		ItemStack boots = new ItemStack(Material.LEATHER_BOOTS, 1);
-		
+
 		LeatherArmorMeta metaHead = (LeatherArmorMeta) helm.getItemMeta();
 		LeatherArmorMeta metaChest = (LeatherArmorMeta) chest.getItemMeta();
 		LeatherArmorMeta metaLegs = (LeatherArmorMeta) legs.getItemMeta();
@@ -61,18 +78,18 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 		metaChest.setColor(Color.WHITE);
 		metaLegs.setColor(Color.WHITE);
 		metaBottom.setColor(Color.WHITE);
-		
+
 		helm.setItemMeta(metaHead);
 		chest.setItemMeta(metaChest);
 		legs.setItemMeta(metaLegs);
 		boots.setItemMeta(metaBottom);
-		
+
 		stand.setHelmet(helm);
 		stand.setChestplate(chest);
 		stand.setLeggings(legs);
 		stand.setBoots(boots);
 		stand.setSmall(false);
-		stand.setVisible(false); 
+		stand.setVisible(false);
 		stand.setMarker(true);
 		// stand.setCustomName("§5Rewards");
 		stand.setCustomNameVisible(false);

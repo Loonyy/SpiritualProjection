@@ -22,6 +22,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public SpiritualProjection(Player player) {
 		super(player);
 
+		//Checks for MultiAbility and sets up each bind 
 		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
 			String abil = MultiAbilityManager.getBoundMultiAbility(player);
 			if (abil.equalsIgnoreCase("SpiritualProjection")) {
@@ -81,6 +82,10 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		// range = ConfigManager.defaultConfig.get().getInt(path + "Range");
 	}
 
+	@Override
+	public void remove() {
+		super.remove();
+	}
 	@Override
 	public void stop() {
 	}

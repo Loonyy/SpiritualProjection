@@ -1,6 +1,5 @@
 package com.loony.spiritualprojection.multiability;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -11,7 +10,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.projectkorra.projectkorra.ability.AddonAbility;
-import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 
@@ -25,6 +23,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	private boolean setTime;
 	private GameMode gameMode;
 	private Location startLocation;
+	private int spiritualEnergy;
 
 	public Spirit(Player player) {
 		super(player);
@@ -33,10 +32,25 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 			remove();
 			return;
 		}
-
 		setFields();
-		start();
 
+		//Checks if the player is in the HashMap
+		if (Meditate.powerAmount.containsKey(player.getName().toString())) {
+
+			//Checks if they have enough spiritual energy to use the ability
+			if (Meditate.powerAmount.get(player.getName().toString()) < spiritualEnergy) {
+				player.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD
+						+ "You do not possess enough spiritual connection to use this ability.");
+
+			}
+			
+			//Continues ability if they have enough spiritual energy
+			if (Meditate.powerAmount.get(player.getName().toString()) >= spiritualEnergy) {
+
+				start();
+			}
+
+		}
 	}
 
 	public void setFields() {
@@ -46,6 +60,16 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 		this.duration = 4000;
 		this.gameMode = player.getGameMode();
 		this.startLocation = player.getLocation().clone();
+		this.spiritualEnergy = 20;
+
+	}
+
+	//Updates the HashMap spiritual energy & boss bar
+	public void powerProgress() {
+		int amountPower = Meditate.powerAmount.get(player.getName().toString());
+		Meditate.powerAmount.put(player.getName().toString(),
+				Meditate.powerAmount.get(player.getName().toString()) - spiritualEnergy);
+		Meditate.bar.setProgress((float) (amountPower - spiritualEnergy) / (float) 100);
 
 	}
 
@@ -53,15 +77,21 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	public void progress() {
 
 		bPlayer.addCooldown(this);
+		
+		//Starts a time for the ability
 		if (!setTime) {
+			powerProgress();
 			setTime = true;
 			this.time = System.currentTimeMillis();
 		}
+		
+		//Checks if the duration is up
 		if (System.currentTimeMillis() > time + duration) {
 			if (player.getLocation().getBlock().getType() != Material.AIR) {
 				player.teleport(startLocation);
 				player.setGameMode(gameMode);
 				player.sendMessage(ChatColor.RED + "Spirit transfer failed.");
+
 				remove();
 				return;
 
@@ -73,12 +103,18 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 			}
 		}
 
+		//Starts ability
 		player.setGameMode(GameMode.SPECTATOR);
 		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 5));
 		ParticleEffect.CLOUD.display(player.getLocation(), 0, 0, 0, 0, 1);
 		player.playSound(player.getEyeLocation(), Sound.ENTITY_TNT_PRIMED, 2, 20);
 		player.setVelocity(player.getEyeLocation().getDirection().clone().normalize().multiply(speed));
 
+	}
+
+	@Override
+	public void remove() {
+		super.remove();
 	}
 
 	@Override
