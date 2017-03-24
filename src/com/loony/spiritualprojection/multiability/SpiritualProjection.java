@@ -37,6 +37,10 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public SpiritualProjection(Player player) {
 		super(player);
 
+		if (bPlayer.isOnCooldown(this)) {
+			remove();
+			return;
+		}
 		// Checks for MultiAbility and sets up each bind
 		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
 			String abil = MultiAbilityManager.getBoundMultiAbility(player);
@@ -60,6 +64,11 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 				case 3:
 					if (player.hasPermission("bending.ability.SpiritualProjection.SpiritualDrain")) {
 						new SpiritualDrain(player);
+					}
+					break;
+				case 4:
+					if (player.hasPermission("bending.ability.SpiritualProjection")) {
+						new Exit(player);
 					}
 					break;
 				default:
@@ -119,7 +128,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		FileConfiguration ExtraAbilities = config.get();
 
 		// SpiritualProjection
-		ExtraAbilities.addDefault(path + "Cooldown", Long.valueOf(6000));
+		ExtraAbilities.addDefault(path + "Cooldown", Long.valueOf(30000));
 
 		// Meditate
 		ExtraAbilities.addDefault(path + "Meditate.Cooldown", Long.valueOf(6000));
@@ -127,6 +136,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "Meditate.EnergyAmount", Integer.valueOf(1));
 
 		// Spirit
+		ExtraAbilities.addDefault(path + "Spirit.Enabled", Boolean.valueOf(true));
 		ExtraAbilities.addDefault(path + "Spirit.SpiritTransfer", Boolean.valueOf(false));
 		ExtraAbilities.addDefault(path + "Spirit.Cooldown", Long.valueOf(5000));
 		ExtraAbilities.addDefault(path + "Spirit.Speed", Double.valueOf(0.6));
@@ -134,6 +144,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "Spirit.SpiritualEnergy", Integer.valueOf(20));
 
 		// AstralAttack
+		ExtraAbilities.addDefault(path + "AstralAttack.Enabled", Boolean.valueOf(true));
 		ExtraAbilities.addDefault(path + "AstralAttack.Duration", Long.valueOf(6000));
 		ExtraAbilities.addDefault(path + "AstralAttack.Speed", Double.valueOf(0.8));
 		ExtraAbilities.addDefault(path + "AstralAttack.Cooldown", Long.valueOf(3000));
@@ -143,6 +154,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "AstralAttack.SpiritualEnergy", Long.valueOf(35));
 		
 		//SpiritualDrain
+		ExtraAbilities.addDefault(path + "SpiritualDrain.Enabled", Boolean.valueOf(true));
 		ExtraAbilities.addDefault(path + "SpiritualDrain.Cooldown", Long.valueOf(15000));
 		ExtraAbilities.addDefault(path + "SpiritualDrain.Range", Integer.valueOf(20));
 		ExtraAbilities.addDefault(path + "SpiritualDrain.DrainSpeed", Double.valueOf(0.8));
@@ -155,14 +167,17 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void remove() {
-		super.remove();
+				SpiritualProjection.bar.remove(player.getName());
+				SpiritualProjection.powerAmount.remove(player.getName());
+				SpiritualProjection.bossBar.removePlayer(player);
+				super.remove();
 
 	}
 
 	@Override
 	public void stop() {
 	}
-
+	
 	@Override
 	public long getCooldown() {
 
@@ -190,7 +205,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public boolean isSneakAbility() {
 
-		return true;
+		return false;
 	}
 
 	@Override
@@ -208,7 +223,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public String getDescription() {
 		return ChatColor.GRAY + "" + ChatColor.BOLD + "Developed by Loony\n" 
-				+ ChatColor.GRAY + "Spiritual Projection is a completely unique and advanced spiritual abilitity that allows you to focus your spiritual energy into attack, defence or even mobility. These abilities require you to have enough spiritual energy, which can be recharged by meditating. To begin using this ability, just tap sneak.";
+				+ ChatColor.GRAY + "Spiritual Projection is a completely unique and advanced spiritual abilitity that allows you to focus your spiritual energy into attack, defence or even mobility. These abilities require you to have enough spiritual energy, which can be recharged by meditating. To begin using this ability, just left click.";
 		
 	}
 
@@ -217,7 +232,8 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		return "\nMeditate - " + ChatColor.GRAY + "Hold sneak to charge up your spiritual energy.\n" + ChatColor.GOLD +
 	"Spirit - " + ChatColor.GRAY + "Hold sneak to transform into a spirit and begin travelling. If you release sneak, the ability will cancel.\n" +
 				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.\n" + 
-	ChatColor.GOLD + "SpiritualDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.";
+	ChatColor.GOLD + "SpiritualDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.\n" +
+				ChatColor.GOLD + "Exit - " + ChatColor.GRAY + "Tap sneak to exit the multi ability.";
 	}
 	
 	
@@ -237,6 +253,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		SpiritualProjection.add(new MultiAbilityInfoSub("Spirit", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("AstralAttack", Element.SPIRITUAL));
 		SpiritualProjection.add(new MultiAbilityInfoSub("SpiritualDrain", Element.SPIRITUAL));
+		SpiritualProjection.add(new MultiAbilityInfoSub("Exit", Element.SPIRITUAL));
 
 		return SpiritualProjection;
 	}

@@ -153,7 +153,11 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
+		if (gameMode != null) {
+			player.setGameMode(gameMode);
+		}
 		super.remove();
+
 	}
 
 	@Override

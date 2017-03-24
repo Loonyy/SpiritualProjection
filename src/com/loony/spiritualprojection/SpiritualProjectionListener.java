@@ -2,7 +2,11 @@ package com.loony.spiritualprojection;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
@@ -17,27 +21,21 @@ import com.projectkorra.projectkorra.event.AbilityStartEvent;
 public class SpiritualProjectionListener implements Listener {
 
 	// This doesn't work because MultiAbilities are shit
-//	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-//	public void onPlayerSlotChange(PlayerItemHeldEvent event) {
-//		Player player = event.getPlayer();
-//		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-//		String abil = bPlayer.getBoundAbilityName();
-//
-//		SpiritualProjection spiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
-//		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
-//			abil = MultiAbilityManager.getBoundMultiAbility(player);
-//			if (spiritualProjection == null) {
-//				Bukkit.broadcastMessage("null");
-//			}
-//			if (abil.equalsIgnoreCase("SpiritualProjection")) {
-//				spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
-//				return;
-//			}
-//		}
-//
-//	}
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void onPlayerSlotChange(PlayerItemHeldEvent event) {
+		Player player = event.getPlayer();
 
-	//Checks if player is spiritually drained
+		SpiritualProjection spiritualProjection = CoreAbility.getAbility(player, SpiritualProjection.class);
+
+		if (spiritualProjection != null) {
+			spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
+			return;
+
+		}
+
+	}
+
+	// Checks if player is spiritually drained
 	@EventHandler
 	public void onAbility(AbilityProgressEvent event) {
 		Player player = event.getAbility().getPlayer();
@@ -47,7 +45,7 @@ public class SpiritualProjectionListener implements Listener {
 		}
 	}
 
-	//Checks if player is spiritually drained
+	// Checks if player is spiritually drained
 	@EventHandler
 	public void onAbilityStart(AbilityStartEvent event) {
 		Player player = event.getAbility().getPlayer();
@@ -70,20 +68,33 @@ public class SpiritualProjectionListener implements Listener {
 			if (abil.equalsIgnoreCase("SpiritualProjection")) {
 				SpiritualProjection.bar.remove(player.getName());
 				SpiritualProjection.powerAmount.remove(player.getName());
+				SpiritualProjection.bossBar.removePlayer(player);
 			}
 		}
 	}
 
 	@EventHandler
+	public void onClick(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		if (event.getAction() == Action.LEFT_CLICK_AIR) {
+			if (bPlayer != null && bPlayer.canBend(CoreAbility.getAbility("SpiritualProjection"))) {
+				new SpiritualProjection(player);
+
+			}
+
+		}
+
+	}
+
+	@EventHandler
 	public void onSneak(PlayerToggleSneakEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 		String abil = bPlayer.getBoundAbilityName();
-
-		if (bPlayer != null && bPlayer.canBend(CoreAbility.getAbility("SpiritualProjection"))) {
-			new SpiritualProjection(player);
-
-		}
 
 		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
 			abil = MultiAbilityManager.getBoundMultiAbility(player);

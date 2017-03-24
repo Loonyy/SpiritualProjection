@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -71,14 +72,18 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 	}
 
 	public void setFields() {
-		
+
 		this.duration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralAttack.Duration");
 		this.speed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Speed");
 		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "AstralAttack.Cooldown");
 		this.damage = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Damage");
-		this.knockback = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.Knockback");
-		this.radius = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.BlastRadius");;
-		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "AstralAttack.SpiritualEnergy");;
+		this.knockback = SpiritualProjection.config.get()
+				.getDouble(SpiritualProjection.path + "AstralAttack.Knockback");
+		this.radius = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "AstralAttack.BlastRadius");
+		;
+		this.spiritualEnergy = SpiritualProjection.config.get()
+				.getInt(SpiritualProjection.path + "AstralAttack.SpiritualEnergy");
+		;
 		this.time = System.currentTimeMillis();
 		this.location = player.getLocation();
 		this.setTime = false;
@@ -197,7 +202,7 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 				DamageHandler.damageEntity(entity, damage, this);
 				AirAbility.breakBreathbendingHold(entity);
 				ParticleEffect.EXPLOSION_HUGE.display(stand.getLocation(), 0, 0, 0, 0, 5);
-				AirAbility.playAirbendingSound(stand.getLocation());
+				entity.getWorld().playEffect(stand.getLocation(), Effect.GHAST_SHRIEK, 0);
 				removeStand();
 				remove();
 
@@ -217,6 +222,7 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
+		removeStand();
 		super.remove();
 	}
 

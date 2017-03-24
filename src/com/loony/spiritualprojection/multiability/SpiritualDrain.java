@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -60,9 +61,12 @@ public class SpiritualDrain extends AirAbility implements AddonAbility {
 	public void setFields() {
 		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "SpiritualDrain.Cooldown");
 		this.range = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "SpiritualDrain.Range");
-		this.drainSpeed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "SpiritualDrain.DrainSpeed");
-		this.spiritualEnergy = SpiritualProjection.config.get().getInt(SpiritualProjection.path + "SpiritualDrain.SpiritualEnergy");
-		this.drainedDuration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "SpiritualDrain.DrainedDuration");
+		this.drainSpeed = SpiritualProjection.config.get()
+				.getDouble(SpiritualProjection.path + "SpiritualDrain.DrainSpeed");
+		this.spiritualEnergy = SpiritualProjection.config.get()
+				.getInt(SpiritualProjection.path + "SpiritualDrain.SpiritualEnergy");
+		this.drainedDuration = SpiritualProjection.config.get()
+				.getLong(SpiritualProjection.path + "SpiritualDrain.DrainedDuration");
 		this.powerTake = false;
 		this.location = player.getLocation();
 
@@ -83,7 +87,7 @@ public class SpiritualDrain extends AirAbility implements AddonAbility {
 	// Gets the players in a radius
 	public void drainPlayers() {
 		for (Entity entity : player.getNearbyEntities(range, range, range)) {
-			if (entity instanceof Player || !entity.getUniqueId().equals(player.getUniqueId())) {
+			if (entity instanceof Player && !entity.getUniqueId().equals(player.getUniqueId())) {
 
 				// Checks if entity has already been drained
 				if (drainedEntities.contains(entity)) {
@@ -105,6 +109,9 @@ public class SpiritualDrain extends AirAbility implements AddonAbility {
 				if (entityLocation.distance(player.getEyeLocation()) < 1) {
 					drainedEntities.add(entity);
 					particleLocation.remove(entity);
+					entity.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD
+							+ "Your spiritual energy has been drained and you are unable to bend.");
+					entity.getWorld().playEffect(entity.getLocation(), Effect.GHAST_SHRIEK, 0);
 
 					// Removes them from drainedEntities after the duration
 					new BukkitRunnable() {
@@ -112,6 +119,8 @@ public class SpiritualDrain extends AirAbility implements AddonAbility {
 						@Override
 						public void run() {
 							drainedEntities.remove(entity);
+							entity.sendMessage(
+									ChatColor.GRAY + "" + ChatColor.BOLD + "Your spiritual energy has been restored.");
 						}
 
 					}.runTaskLater(ProjectKorra.plugin, drainedDuration / 50);
@@ -150,6 +159,11 @@ public class SpiritualDrain extends AirAbility implements AddonAbility {
 	public long getCooldown() {
 
 		return cooldown;
+	}
+
+	@Override
+	public boolean isHiddenAbility() {
+		return true;
 	}
 
 	@Override
