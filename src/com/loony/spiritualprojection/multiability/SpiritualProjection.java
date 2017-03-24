@@ -223,7 +223,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public String getDescription() {
 		return ChatColor.GRAY + "" + ChatColor.BOLD + "Developed by Loony\n" 
-				+ ChatColor.GRAY + "Spiritual Projection is a completely unique and advanced spiritual abilitity that allows you to focus your spiritual energy into attack, defence or even mobility. These abilities require you to have enough spiritual energy, which can be recharged by meditating. To begin using this ability, just left click.";
+				+ ChatColor.GRAY + "Spiritual Projection is a completely unique and advanced spiritual ability that allows you to focus your spiritual energy into attack, defense or even mobility. These abilities require you to have enough spiritual energy, which can be recharged by meditating. To begin using this ability, just left click.";
 		
 	}
 
