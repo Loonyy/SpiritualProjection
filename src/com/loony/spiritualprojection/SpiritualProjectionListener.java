@@ -1,5 +1,6 @@
 package com.loony.spiritualprojection;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,6 +9,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import com.loony.spiritualprojection.multiability.SpiritualDrain;
@@ -31,6 +33,24 @@ public class SpiritualProjectionListener implements Listener {
 			spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
 			return;
 
+		}
+
+	}
+
+	@EventHandler
+	public void onTP(PlayerTeleportEvent event) {
+		Player player = event.getPlayer();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		String abil = bPlayer.getBoundAbilityName();
+
+		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
+			abil = MultiAbilityManager.getBoundMultiAbility(player);
+			if (abil.equalsIgnoreCase("SpiritualProjection")) {
+				if (event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+
+					event.setCancelled(true);
+				}
+			}
 		}
 
 	}
