@@ -215,7 +215,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public String getVersion() {
 
-		return "1.0.1";
+		return "1.0.3";
 	}
 	
 	@Override

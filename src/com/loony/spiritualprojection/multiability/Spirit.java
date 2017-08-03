@@ -3,7 +3,6 @@ package com.loony.spiritualprojection.multiability;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPig;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -102,7 +101,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 			player.setInvulnerable(false);
 			player.setFlying(false);
 			player.setAllowFlight(false);
-			((CraftPig) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
+			((LivingEntity) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
 			remove();
 			return;
 
@@ -120,8 +119,8 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 		npc = new NPC(player.getName(), startLocation);
 
 		pig = player.getWorld().spawnEntity(player.getLocation().add(0, -0.9, 0), EntityType.PIG);
-		((CraftPig) pig).setInvulnerable(true);
-		((CraftPig) pig).setGravity(true);
+		((LivingEntity) pig).setInvulnerable(true);
+		((LivingEntity) pig).setGravity(true);
 		PotionEffect poe = new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false);
 
 		((LivingEntity) pig).addPotionEffect(poe);
@@ -160,7 +159,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		}
 		if (pig != null) {
-			((CraftPig) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
+			((LivingEntity) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
 			pig.remove();
 		}
 		player.teleport(startLocation.add(0, 1, 0));
