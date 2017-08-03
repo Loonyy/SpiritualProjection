@@ -13,7 +13,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import com.loony.spiritualprojection.SpiritualProjectionListener;
+import com.loony.spiritualprojection.utils.SpiritualProjectionListener;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -47,22 +47,22 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 			if (abil.equalsIgnoreCase("SpiritualProjection")) {
 				switch (player.getInventory().getHeldItemSlot()) {
 				case 0:
-					if (player.hasPermission("bending.ability.SpiritualProjection.Meditate")) {
+					if (player.hasPermission("bending.ability.Meditate")) {
 						new Meditate(player);
 					}
 					break;
 				case 1:
-					if (player.hasPermission("bending.ability.SpiritualProjection.Spirit")) {
+					if (player.hasPermission("bending.ability.Spirit")) {
 						new Spirit(player);
 					}
 					break;
 				case 2:
-					if (player.hasPermission("bending.ability.SpiritualProjection.AtralAttack")) {
+					if (player.hasPermission("bending.ability.AstralAttack")) {
 						new AstralAttack(player);
 					}
 					break;
 				case 3:
-					if (player.hasPermission("bending.ability.SpiritualProjection.SpiritualDrain")) {
+					if (player.hasPermission("bending.ability.SpiritualDrain")) {
 						new SpiritualDrain(player);
 					}
 					break;
@@ -99,7 +99,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	public void setupPower() {
 
 		if (!powerAmount.containsKey(player.getName().toString())) {
-			powerAmount.put(player.getName().toString(), 0);
+			powerAmount.put(player.getName().toString(), 100);
 		}
 
 		if (!bar.containsKey(player.getName())) {
@@ -137,10 +137,8 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 		// Spirit
 		ExtraAbilities.addDefault(path + "Spirit.Enabled", Boolean.valueOf(true));
-		ExtraAbilities.addDefault(path + "Spirit.SpiritTransfer", Boolean.valueOf(false));
 		ExtraAbilities.addDefault(path + "Spirit.Cooldown", Long.valueOf(5000));
-		ExtraAbilities.addDefault(path + "Spirit.Speed", Double.valueOf(0.6));
-		ExtraAbilities.addDefault(path + "Spirit.Duration", Long.valueOf(4500));
+		ExtraAbilities.addDefault(path + "Spirit.Duration", Long.valueOf(60000));
 		ExtraAbilities.addDefault(path + "Spirit.SpiritualEnergy", Integer.valueOf(20));
 
 		// AstralAttack
@@ -160,7 +158,6 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 		ExtraAbilities.addDefault(path + "SpiritualDrain.DrainSpeed", Double.valueOf(0.8));
 		ExtraAbilities.addDefault(path + "SpiritualDrain.DrainedDuration", Long.valueOf(5500));
 		ExtraAbilities.addDefault(path + "SpiritualDrain.SpiritualEnergy", Integer.valueOf(45));
-
 		config.save();
 
 	}
@@ -176,6 +173,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void stop() {
+		remove();
 	}
 	
 	@Override
@@ -217,7 +215,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public String getVersion() {
 
-		return "1.0.0";
+		return "1.0.1";
 	}
 	
 	@Override
@@ -230,7 +228,7 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 	@Override
 	public String getInstructions() {
 		return "\nMeditate - " + ChatColor.GRAY + "Hold sneak to charge up your spiritual energy.\n" + ChatColor.GOLD +
-	"Spirit - " + ChatColor.GRAY + "Hold sneak to transform into a spirit and begin travelling. If you release sneak, the ability will cancel.\n" +
+	"Spirit - " + ChatColor.GRAY + "Tap sneak to transform into a spirit. Left click to exit spirit mode.\n" +
 				ChatColor.GOLD + "AstralAttack - " + ChatColor.GRAY + "Hold sneak to send out an astral projection in attack form, damaging anyone that comes into contact with it. This astral attack will go in the direction that you're looking.\n" + 
 	ChatColor.GOLD + "SpiritualDrain - " + ChatColor.GRAY + "Hold sneak to start draining the spiritual energy out of players that are in range. Once players are drained, they won't be able to use abilities for a certain amount of time. This ability also heals you once you've drained their spiritual connection.\n" +
 				ChatColor.GOLD + "Exit - " + ChatColor.GRAY + "Tap sneak to exit the multi ability.";

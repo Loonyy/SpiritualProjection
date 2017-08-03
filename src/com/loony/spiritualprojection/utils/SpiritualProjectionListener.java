@@ -1,6 +1,5 @@
-package com.loony.spiritualprojection;
+package com.loony.spiritualprojection.utils;
 
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,9 +8,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
+import com.loony.spiritualprojection.multiability.Spirit;
 import com.loony.spiritualprojection.multiability.SpiritualDrain;
 import com.loony.spiritualprojection.multiability.SpiritualProjection;
 import com.projectkorra.projectkorra.BendingPlayer;
@@ -33,24 +32,6 @@ public class SpiritualProjectionListener implements Listener {
 			spiritualProjection.displayBoundMsg(event.getNewSlot() + 1);
 			return;
 
-		}
-
-	}
-
-	@EventHandler
-	public void onTP(PlayerTeleportEvent event) {
-		Player player = event.getPlayer();
-		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-		String abil = bPlayer.getBoundAbilityName();
-
-		if (MultiAbilityManager.hasMultiAbilityBound(player)) {
-			abil = MultiAbilityManager.getBoundMultiAbility(player);
-			if (abil.equalsIgnoreCase("SpiritualProjection")) {
-				if (event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
-
-					event.setCancelled(true);
-				}
-			}
 		}
 
 	}
@@ -97,12 +78,20 @@ public class SpiritualProjectionListener implements Listener {
 	public void onClick(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		String abil = bPlayer.getBoundAbilityName();
 		if (event.getAction() == Action.LEFT_CLICK_AIR) {
 			if (bPlayer != null && bPlayer.canBend(CoreAbility.getAbility("SpiritualProjection"))) {
 				new SpiritualProjection(player);
 
 			}
-
+			if (MultiAbilityManager.hasMultiAbilityBound(player)) {
+				abil = MultiAbilityManager.getBoundMultiAbility(player);
+				if (abil.equalsIgnoreCase("SpiritualProjection")) {
+					if (Spirit.getAbility(player, Spirit.class) != null) {
+						Spirit.getAbility(player, Spirit.class).remove();
+					}
+				}
+			}
 		}
 
 	}
@@ -122,6 +111,7 @@ public class SpiritualProjectionListener implements Listener {
 
 				if (abil.equalsIgnoreCase("SpiritualProjection")) {
 					new SpiritualProjection(player);
+
 				}
 
 			}

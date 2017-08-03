@@ -45,6 +45,9 @@ public class Exit extends AirAbility implements AddonAbility {
 		SpiritualProjection.bar.remove(player.getName());
 		SpiritualProjection.powerAmount.remove(player.getName());
 		SpiritualProjection.bossBar.removePlayer(player);
+		if (Spirit.getAbility(player, Spirit.class) != null) {
+			Spirit.getAbility(player, Spirit.class).remove();
+		}
 		super.remove();
 	}
 

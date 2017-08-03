@@ -1,38 +1,40 @@
 package com.loony.spiritualprojection.multiability;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPig;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
-import com.projectkorra.projectkorra.GeneralMethods;
+import com.loony.spiritualprojection.utils.NPC;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.SpiritualAbility;
-import com.projectkorra.projectkorra.util.ParticleEffect;
 
 public class Spirit extends SpiritualAbility implements AddonAbility {
 
 	private Location location;
 	private long time;
 	private long cooldown;
-	private double speed;
 	private long duration;
 	private boolean setTime;
-	private GameMode gameMode;
-	private Location startLocation;
+	public Location startLocation;
 	private int spiritualEnergy;
-	private boolean canSpiritTransfer;
+	public boolean SNPC = false;
+	private  NPC npc;
+
+	private Entity pig;
 
 	public Spirit(Player player) {
 		super(player);
 
 		if (bPlayer.isOnCooldown(this) || !bPlayer.canBendIgnoreBinds(this)) {
-			remove();
+
 			return;
 		}
 		setFields();
@@ -50,6 +52,12 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 			// Continues ability if they have enough spiritual energy
 			if (SpiritualProjection.powerAmount.get(player.getName().toString()) >= spiritualEnergy) {
 
+				if (startLocation.add(0, -1, 0).getBlock().isEmpty()) {
+					Bukkit.broadcastMessage(ChatColor.GRAY + "" + ChatColor.BOLD
+							+ "You must not be moving and be standing on solid ground to use this ability.");
+					remove();
+					return;
+				}
 				start();
 			}
 
@@ -59,14 +67,11 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	public void setFields() {
 
 		this.cooldown = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Cooldown");
-		this.speed = SpiritualProjection.config.get().getDouble(SpiritualProjection.path + "Spirit.Speed");
 		this.duration = SpiritualProjection.config.get().getLong(SpiritualProjection.path + "Spirit.Duration");
 		this.spiritualEnergy = SpiritualProjection.config.get()
 				.getInt(SpiritualProjection.path + "Spirit.SpiritualEnergy");
-		this.canSpiritTransfer = SpiritualProjection.config.get()
-				.getBoolean(SpiritualProjection.path + "Spirit.SpiritTransfer");
+
 		this.location = player.getLocation();
-		this.gameMode = player.getGameMode();
 		this.startLocation = player.getLocation().clone();
 
 	}
@@ -74,29 +79,12 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	@Override
 	public void progress() {
 
-		bPlayer.addCooldown(this);
-		if (!player.isSneaking()) {
-			if (!canSpiritTransfer) {
-				player.teleport(startLocation);
-				player.setGameMode(gameMode);
-
-			}
-			if (player.getLocation().getBlock().getType() != Material.AIR) {
-				player.teleport(startLocation);
-				player.setGameMode(gameMode);
-				player.sendMessage(ChatColor.RED + "Spirit transfer failed.");
-
-				remove();
-				return;
-
-			} else {
-
-				player.setGameMode(gameMode);
-				remove();
-				return;
-			}
+		if (SNPC == false) {
+			spawnNPC();
 
 		}
+		bPlayer.addCooldown(this);
+
 		// Starts a time for the ability
 		if (!setTime) {
 			powerProgress();
@@ -106,36 +94,42 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		// Checks if the duration is up
 		if (System.currentTimeMillis() > time + duration) {
-			if (!canSpiritTransfer) {
-				player.teleport(startLocation);
-				player.setGameMode(gameMode);
+			player.teleport(startLocation.add(0, 1, 0));
+			player.setGlowing(false);
+			player.setCollidable(true);
+			player.setCanPickupItems(true);
+			player.setGliding(false);
+			player.setInvulnerable(false);
+			player.setFlying(false);
+			player.setAllowFlight(false);
+			((CraftPig) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
+			remove();
+			return;
 
-			}
-			if (player.getLocation().getBlock().getType() != Material.AIR
-					|| GeneralMethods.isRegionProtectedFromBuild(player, location)) {
-				player.teleport(startLocation);
-				player.setGameMode(gameMode);
-				player.sendMessage(ChatColor.RED + "Spirit transfer failed.");
-
-				remove();
-				return;
-
-			} else {
-
-				player.setGameMode(gameMode);
-				remove();
-				return;
-			}
 		}
 
-		// Starts ability
-		player.setGameMode(GameMode.SPECTATOR);
-		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 5));
-		ParticleEffect.CLOUD.display(player.getLocation(), 0, 0, 0, 0, 1);
-		player.playSound(player.getEyeLocation(), Sound.ENTITY_TNT_PRIMED, 2, 20);
-		player.setVelocity(
-				player.getEyeLocation().getDirection().clone().normalize().multiply(speed).add(new Vector(0, 0.25, 0)));
+		player.setGlowing(true);
+		player.setCanPickupItems(false);
+		player.setInvulnerable(true);
+		player.setAllowFlight(true);
+		player.setFlying(true);
+	}
 
+	public void spawnNPC() {
+
+		npc = new NPC(player.getName(), startLocation);
+
+		pig = player.getWorld().spawnEntity(player.getLocation().add(0, -0.9, 0), EntityType.PIG);
+		((CraftPig) pig).setInvulnerable(true);
+		((CraftPig) pig).setGravity(true);
+		PotionEffect poe = new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false);
+
+		((LivingEntity) pig).addPotionEffect(poe);
+
+		((Pig) pig).setAI(false);
+		npc.setPassenger(pig);
+
+		SNPC = true;
 	}
 
 	// Updates the HashMap spiritual energy & boss bar
@@ -153,9 +147,24 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
-		if (gameMode != null) {
-			player.setGameMode(gameMode);
+		player.setGlowing(false);
+		player.setCollidable(true);
+		player.setCanPickupItems(true);
+		player.setGliding(false);
+		player.setInvulnerable(false);
+		player.setFlying(false);
+		player.setAllowFlight(false);
+
+		if (npc != null) {
+			npc.destroy();
+
 		}
+		if (pig != null) {
+			((CraftPig) pig).removePotionEffect(PotionEffectType.INVISIBILITY);
+			pig.remove();
+		}
+		player.teleport(startLocation.add(0, 1, 0));
+		SNPC = false;
 		super.remove();
 
 	}
@@ -181,7 +190,7 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	@Override
 	public boolean isHarmlessAbility() {
 
-		return false;
+		return true;
 	}
 
 	@Override
@@ -199,6 +208,10 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 	public String getAuthor() {
 
 		return "Loony";
+	}
+
+	public Boolean canBendIgnoreBinds() {
+		return true;
 	}
 
 	@Override
