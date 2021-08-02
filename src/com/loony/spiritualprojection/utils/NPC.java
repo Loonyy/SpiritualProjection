@@ -62,6 +62,7 @@ public class NPC {
 	private Object ADD_PLAYER;
 	private Object packetOutEntity;
 	private Object packetHead;
+	private Object packetMount = null;
 	private UUID uuid;
 	private String skin;
 	private Object removePlayer;
@@ -234,9 +235,19 @@ public class NPC {
 
 	public void setPassenger(Entity entity) {
 		try {
-			Object CraftPig = EntityPlayerClass.getMethod("getBukkitEntity").invoke(EntityPlayer);
-			Method setPassenger = CraftPig.getClass().getMethod("setPassenger", Entity.class);
-			setPassenger.invoke(entity, CraftPig);
+			String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+			
+			Object craftPlayer = EntityPlayerClass.getMethod("getBukkitEntity").invoke(EntityPlayer);
+			Object player = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer").getMethod("getPlayer").invoke(craftPlayer);
+			Class CraftEntity = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftEntity");
+			Object nmsPlayer = CraftEntity.getMethod("getHandle").invoke(player);
+			Object nmsEntity = CraftEntity.getMethod("getHandle").invoke(entity);
+			getNMSClass("Entity").getMethod("startRiding", getNMSClass("Entity")).invoke(nmsPlayer, nmsEntity);
+			
+			packetMount = getNMSClass("PacketPlayOutMount").getConstructor(getNMSClass("Entity")).newInstance(nmsPlayer);
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				sendPackets(p, packetMount);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -322,7 +333,7 @@ public class NPC {
 			uuid = UUID.randomUUID();
 			GameProfile = new ProfileLoader(uuid.toString(), this.name, skin, this).loadProfile();
 			PlayerInteractManager = getNMSClass("PlayerInteractManager")
-					.getConstructor(World.getClass().getSuperclass()).newInstance(World);
+					.getConstructor(WorldServer.getClass()).newInstance(WorldServer);
 			EntityPlayerConstructor = EntityPlayerClass.getConstructor(MinecraftServer.getClass().getSuperclass(),
 					WorldServer.getClass(), GameProfile.getClass(), PlayerInteractManager.getClass());
 			EntityPlayer = EntityPlayerConstructor.newInstance(MinecraftServer, WorldServer, GameProfile,
@@ -340,7 +351,7 @@ public class NPC {
 			TabPacket = Constructor.newInstance(ADD_PLAYER, getArray(EntityPlayerClass, EntityPlayer));
 			SpawnPacket = getNMSClass("PacketPlayOutNamedEntitySpawn")
 					.getConstructor(EntityPlayer.getClass().getSuperclass()).newInstance(EntityPlayer);
-			Constructor<?> cs = getNMSClass("PacketPlayOutEntity").getClasses()[0].getConstructor(int.class, byte.class,
+			Constructor<?> cs = getNMSClass("PacketPlayOutEntity$PacketPlayOutEntityLook").getConstructor(int.class, byte.class,
 					byte.class, boolean.class);
 			packetOutEntity = cs.newInstance(id, getFixRotation(loc.getYaw()), getFixRotation(loc.getPitch()), true);
 			Constructor = getNMSClass("PacketPlayOutEntityHeadRotation")
@@ -372,6 +383,9 @@ public class NPC {
 	public void show(Player p) {
 		sendPackets(p, TabPacket, SpawnPacket);
 		sendPackets(p, packetOutEntity, packetHead);
+		if (packetMount != null) {
+			sendPackets(p, packetMount);
+		}
 	}
 
 	public Integer getEntityID() {

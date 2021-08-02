@@ -154,38 +154,40 @@ public class AstralAttack extends SpiritualAbility implements AddonAbility {
 	}
 
 	public ArmorStand Stand(Location location) {
-		this.stand = location.getWorld().spawn(location, ArmorStand.class);
-		stand.setGravity(true);
-		stand.setSmall(true);
-		ItemStack helm = new ItemStack(Material.LEATHER_HELMET, 1);
-		ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
-		ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS, 1);
-		ItemStack boots = new ItemStack(Material.LEATHER_BOOTS, 1);
+		this.stand = location.getWorld().spawn(location, ArmorStand.class, stand -> {
+			stand.setGravity(true);
+			stand.setSmall(true);
+			ItemStack helm = new ItemStack(Material.LEATHER_HELMET, 1);
+			ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
+			ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS, 1);
+			ItemStack boots = new ItemStack(Material.LEATHER_BOOTS, 1);
 
-		LeatherArmorMeta metaHead = (LeatherArmorMeta) helm.getItemMeta();
-		LeatherArmorMeta metaChest = (LeatherArmorMeta) chest.getItemMeta();
-		LeatherArmorMeta metaLegs = (LeatherArmorMeta) legs.getItemMeta();
-		LeatherArmorMeta metaBottom = (LeatherArmorMeta) boots.getItemMeta();
+			LeatherArmorMeta metaHead = (LeatherArmorMeta) helm.getItemMeta();
+			LeatherArmorMeta metaChest = (LeatherArmorMeta) chest.getItemMeta();
+			LeatherArmorMeta metaLegs = (LeatherArmorMeta) legs.getItemMeta();
+			LeatherArmorMeta metaBottom = (LeatherArmorMeta) boots.getItemMeta();
 
-		metaHead.setColor(Color.WHITE);
-		metaChest.setColor(Color.WHITE);
-		metaLegs.setColor(Color.WHITE);
-		metaBottom.setColor(Color.WHITE);
+			metaHead.setColor(Color.WHITE);
+			metaChest.setColor(Color.WHITE);
+			metaLegs.setColor(Color.WHITE);
+			metaBottom.setColor(Color.WHITE);
 
-		helm.setItemMeta(metaHead);
-		chest.setItemMeta(metaChest);
-		legs.setItemMeta(metaLegs);
-		boots.setItemMeta(metaBottom);
+			helm.setItemMeta(metaHead);
+			chest.setItemMeta(metaChest);
+			legs.setItemMeta(metaLegs);
+			boots.setItemMeta(metaBottom);
 
-		stand.setHelmet(helm);
-		stand.setChestplate(chest);
-		stand.setLeggings(legs);
-		stand.setBoots(boots);
-		stand.setSmall(false);
-		stand.setVisible(false);
-		stand.setMarker(true);
-		// stand.setCustomName("§5Rewards");
-		stand.setCustomNameVisible(false);
+			stand.setHelmet(helm);
+			stand.setChestplate(chest);
+			stand.setLeggings(legs);
+			stand.setBoots(boots);
+			stand.setSmall(false);
+			stand.setVisible(false);
+			// stand.setMarker(true);
+			// stand.setCustomName("§5Rewards");
+			stand.setCustomNameVisible(false);
+		});
+		
 		stands.add(stand.getEntityId());
 		this.spawnStand = true;
 		this.standLocation = stand.getLocation();

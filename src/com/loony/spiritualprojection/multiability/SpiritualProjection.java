@@ -164,10 +164,14 @@ public class SpiritualProjection extends SpiritualAbility implements AddonAbilit
 
 	@Override
 	public void remove() {
-				SpiritualProjection.bar.remove(player.getName());
-				SpiritualProjection.powerAmount.remove(player.getName());
+		if (player != null) {
+			SpiritualProjection.bar.remove(player.getName());
+			SpiritualProjection.powerAmount.remove(player.getName());
+			if (SpiritualProjection.bossBar != null) {
 				SpiritualProjection.bossBar.removePlayer(player);
-				super.remove();
+			}
+		}
+		super.remove();
 
 	}
 
