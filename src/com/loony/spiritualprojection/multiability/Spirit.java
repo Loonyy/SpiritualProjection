@@ -118,14 +118,15 @@ public class Spirit extends SpiritualAbility implements AddonAbility {
 
 		npc = new NPC(player.getName(), startLocation);
 
-		pig = player.getWorld().spawnEntity(player.getLocation().add(0, -0.9, 0), EntityType.PIG);
-		((LivingEntity) pig).setInvulnerable(true);
-		((LivingEntity) pig).setGravity(true);
-		PotionEffect poe = new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false);
+		pig = player.getWorld().spawn(player.getLocation().add(0, -0.9, 0), Pig.class, pig -> {
+			((LivingEntity) pig).setInvulnerable(true);
+			((LivingEntity) pig).setGravity(true);
+			PotionEffect poe = new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false);
 
-		((LivingEntity) pig).addPotionEffect(poe);
+			((LivingEntity) pig).addPotionEffect(poe);
+			((Pig) pig).setAI(false);
+		});
 
-		((Pig) pig).setAI(false);
 		npc.setPassenger(pig);
 
 		SNPC = true;

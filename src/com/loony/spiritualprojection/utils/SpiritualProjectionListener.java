@@ -1,5 +1,6 @@
 package com.loony.spiritualprojection.utils;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 
 import com.loony.spiritualprojection.multiability.Spirit;
 import com.loony.spiritualprojection.multiability.SpiritualDrain;
@@ -20,6 +22,19 @@ import com.projectkorra.projectkorra.event.AbilityProgressEvent;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
 
 public class SpiritualProjectionListener implements Listener {
+	
+	// Cancel Vehicle events if it's an NPC sitting
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onVehicle(VehicleEnterEvent event) {
+		Entity entity = event.getEntered();
+		
+		for(NPC npc : NPC.npcs) {
+			if(npc.getUUID() == entity.getUniqueId()) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
 
 	// This doesn't work because MultiAbilities are shit
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
